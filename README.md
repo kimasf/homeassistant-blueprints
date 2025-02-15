@@ -1,64 +1,54 @@
-# Home Assistant Presence Sensor Blueprint
+# 🏠 Home Assistant Presence Sensor Blueprint  
 
-## 📌 Overview
-This blueprint automates lighting based on motion detection. It **saves the current state of all lights** in a room before turning them off and **restores the same lights** when motion is detected again.
+## 📌 Overview  
+This blueprint automates lighting based on motion detection. It **saves the current state of all lights** in a room before turning them off and **restores the same lights** when motion is detected again.  
+
+### 🔹 Main Features:  
+- ✅ Works with **any motion sensor**  
+- ✅ **Saves the state of all lights** in the room  
+- ✅ **Restores the lights** when motion is detected  
+- ✅ Adjustable **delay before turning off** (seconds & minutes)  
+- ✅ **Easy setup** – No coding required!  
+
+---  
 
 ## 📥 Quick Import to Home Assistant  
 
-[![Open your Home Assistant instance and import this Blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?repository_url=https://raw.githubusercontent.com/kimasf/homeassistant-blueprints/main/presence_sensor.yaml)
+Click the button below to **import this blueprint** directly into Home Assistant:  
 
+[![Open your Home Assistant instance and import this Blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?repository_url=https://raw.githubusercontent.com/kimasf/homeassistant-blueprints/main/presence_sensor.yaml)  
 
-🔹 **Main Features:**
-- ✅ Works with **any motion sensor**
-- ✅ **Saves the state of all lights** in the room
-- ✅ **Restores the lights** when motion is detected
-- ✅ Adjustable **delay before turning off** (seconds & minutes)
-- ✅ **Easy setup** – No coding required!
-
----
-
-## 🛠️ Requirements
-To use this blueprint, you need:
-- A **motion sensor** integrated with Home Assistant (e.g., Zigbee, Z-Wave, WiFi PIR sensors)
-- Smart lights or light switches that Home Assistant can control
-
----
-
-## 📥 Installation
-### **1️⃣ Import the Blueprint**
-Click the link below to **import** this blueprint directly into Home Assistant:
-
-🔗 [**Import Blueprint**](https://my.home-assistant.io/redirect/blueprint_import/?repository_url=https://raw.githubusercontent.com/kimasf/homeassistant-blueprints/refs/heads/main/presence_sensor.yaml)
-
-Alternatively, you can manually copy the YAML file to:
+Alternatively, you can manually copy the YAML file to:  
 ```bash
-/config/blueprints/automation/YOUR_FOLDER/presence_sensor.yaml
+/config/blueprints/automation/kimasf/presence_sensor.yaml
 ```
 
 ---
 
-## ⚙️ Configuration
-### **2️⃣ Create a New Automation**
-1. Go to **Settings** → **Automations & Scenes** → **Blueprints**.
-2. Select **Presence Sensor Blueprint**.
-3. Click **Create Automation**.
+## ⚙️ Installation & Configuration  
 
-### **3️⃣ Customize Your Settings**
-- **Motion Sensor** → Select your motion sensor.
-- **Lights to Control** → Choose the lights in your room.
-- **Turn-Off Delay** → Set the delay before lights turn off (in seconds/minutes).
-- **Scene Name** → (Optional) Customize the saved scene name.
+### **1️⃣ Create a New Automation**  
+1. Go to **Settings** → **Automations & Scenes** → **Blueprints**.  
+2. Select **Presence Sensor Blueprint**.  
+3. Click **Create Automation**.  
 
----
-
-## 🔄 How It Works
-1. When motion is **detected**, the blueprint **restores the previous lights** in the room.
-2. When no motion is detected for the set delay, it **saves the current light state** and **turns them off**.
-3. The next time motion is detected, the **same lights** will turn back on!
+### **2️⃣ Customize Your Settings**  
+- **Motion Sensor** → Select your motion sensor.  
+- **Lights to Control** → Choose the lights in your room.  
+- **Turn-Off Delay** → Set the delay before lights turn off (in seconds/minutes).  
+- **Scene Name** → (Optional) Customize the saved scene name.  
 
 ---
 
-## 📝 YAML Code (For Manual Use)
+## 🔄 How It Works  
+1. When motion is **detected**, the blueprint **restores the previous lights** in the room.  
+2. When no motion is detected for the set delay, it **saves the current light state** and **turns them off**.  
+3. The next time motion is detected, the **same lights** will turn back on!  
+
+---
+
+## 📝 YAML Code (For Manual Use)  
+
 ```yaml
 blueprint:
   name: Presence Sensor Blueprint
@@ -104,16 +94,16 @@ blueprint:
       selector:
         text:
 
-mode: single
+variables:
+  scene_full_name: !input scene_name
+
 trigger:
   - platform: state
     entity_id: !input motion_sensor
-    from: "off"
     to: "on"
     id: motion_on
   - platform: state
     entity_id: !input motion_sensor
-    from: "on"
     to: "off"
     for:
       minutes: !input delay_minutes
@@ -130,7 +120,7 @@ action:
         sequence:
           - service: scene.create
             data:
-              scene_id: !input scene_name
+              scene_id: "{{ scene_full_name }}"
               snapshot_entities: !input lights
           - service: light.turn_off
             target:
@@ -141,18 +131,19 @@ action:
         sequence:
           - service: scene.turn_on
             target:
-              entity_id: scene.!input scene_name
+              entity_id: "scene.{{ scene_full_name }}"
           - service: scene.delete
             target:
-              entity_id: scene.!input scene_name
+              entity_id: "scene.{{ scene_full_name }}"
+mode: single
 ```
 
 ---
 
-## ❓ Support & Feedback
-If you have any questions or suggestions, feel free to:
-- Comment on the **GitHub Issues** page
-- Join the **Home Assistant Community** discussions
+## ❓ Support & Feedback  
+If you have any questions or suggestions, feel free to:  
+- Comment on the **GitHub Issues** page  
+- Join the **Home Assistant Community** discussions  
 
-🚀 Enjoy your smart home automation with **Presence Sensor Blueprint**! 🎉
+🚀 Enjoy your smart home automation with **Presence Sensor Blueprint**! 🎉  
 
