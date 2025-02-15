@@ -7,6 +7,7 @@ This blueprint automates lighting based on motion detection. It **saves the curr
 
 [![Open your Home Assistant instance and import this Blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?repository_url=https://raw.githubusercontent.com/kimasf/homeassistant-blueprints/main/presence_sensor.yaml)
 
+
 🔹 **Main Features:**
 - ✅ Works with **any motion sensor**
 - ✅ **Saves the state of all lights** in the room
