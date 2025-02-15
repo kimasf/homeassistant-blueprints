@@ -86,7 +86,7 @@ action:
         sequence:
           - service: scene.turn_on
             target:
-              entity_id: scene.!input scene_name
+              entity_id: "{{ 'scene.' ~ scene_name }}"
           - service: scene.delete
             target:
-              entity_id: scene.!input scene_nam
+              entity_id: "{{ 'scene.' ~ scene_name }}"
