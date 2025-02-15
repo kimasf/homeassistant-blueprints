@@ -21,7 +21,7 @@ To use this blueprint, you need:
 
 ## 📥 Quick Import to Home Assistant
 
-[![Open your Home Assistant instance and import this Blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?repository_url=https://raw.githubusercontent.com/kimasf/homeassistant-blueprints/main/presence_sensor.yaml)
+[![Open in Home Assistant](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?url=https://raw.githubusercontent.com/kimasf/homeassistant-blueprints/main/presence_sensor.yaml)
 
 Alternatively, you can manually copy the YAML file to:
 ```bash
