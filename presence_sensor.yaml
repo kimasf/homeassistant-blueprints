@@ -1,94 +1,92 @@
 blueprint:
-  name: "💡 Presence Sensor (Customizable)"
-  description: "Turns off lights after a user-defined time of no motion and restores previous state."
+  name: "Presence Sensor Blueprint"
+  description: "Automates lighting based on motion, saves & restores light state."
   domain: automation
   input:
     motion_sensor:
-      name: Motion Sensor
-      description: "Select the motion sensor for detection."
+      name: "Motion Sensor"
+      description: "Select the motion sensor."
       selector:
         entity:
           domain: binary_sensor
+          device_class: motion
 
     lights:
-      name: Lights
-      description: "Select the lights to control."
+      name: "Lights to Control"
+      description: "Choose lights in the room to turn on/off."
       selector:
         entity:
           domain: light
           multiple: true
 
-    scene_name:
-      name: Scene Name
-      description: "Enter a unique name for the scene (no spaces, use _ instead)."
-      selector:
-        text:
-
     delay_minutes:
-      name: Delay (Minutes)
-      description: "Minutes before turning off lights after no motion."
+      name: "Turn-Off Delay (Minutes)"
+      description: "Set the delay before turning lights off."
       default: 1
       selector:
         number:
           min: 0
           max: 60
-          unit_of_measurement: "min"
+          unit_of_measurement: minutes
 
     delay_seconds:
-      name: Delay (Seconds)
-      description: "Additional seconds before turning off lights."
+      name: "Turn-Off Delay (Seconds)"
+      description: "Additional delay in seconds."
       default: 0
       selector:
         number:
           min: 0
           max: 59
-          unit_of_measurement: "sec"
+          unit_of_measurement: seconds
 
-variables:
-  scene_full_name: !input scene_name
+    scene_name:
+      name: "Scene Name"
+      description: "Enter a unique scene name (no spaces, use underscores '_')."
+      default: "presence_lights_scene"
+      selector:
+        text:
+
+mode: single
 
 trigger:
   - platform: state
     entity_id: !input motion_sensor
+    from: "off"
     to: "on"
-    id: Motion_ON
+    id: motion_on
 
   - platform: state
     entity_id: !input motion_sensor
+    from: "on"
     to: "off"
     for:
       minutes: !input delay_minutes
       seconds: !input delay_seconds
-    id: Motion_OFF
+    id: motion_off
+
+condition: []
 
 action:
   - choose:
       - conditions:
           - condition: trigger
-            id: Motion_OFF
-          - condition: state
-            entity_id: !input motion_sensor
-            state: "off"
+            id: motion_off
         sequence:
           - service: scene.create
             data:
+              scene_id: !input scene_name
               snapshot_entities: !input lights
-              scene_id: "{{ scene_full_name }}"
-
           - service: light.turn_off
             target:
               entity_id: !input lights
 
       - conditions:
           - condition: trigger
-            id: Motion_ON
+            id: motion_on
         sequence:
           - service: scene.turn_on
-            data:
-              entity_id: "scene.{{ scene_full_name }}"
-
+            target:
+              entity_id: scene.!input scene_name
           - service: scene.delete
-            data:
-              entity_id: "scene.{{ scene_full_name }}"
-
-mode: single
+            target:
+              entity_id: scene.!input scene_nam
