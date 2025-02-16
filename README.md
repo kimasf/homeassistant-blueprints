@@ -54,48 +54,50 @@ Alternatively, you can manually copy the YAML file to:
 ## 📝 YAML Code (For Manual Use)
 ```yaml
 blueprint:
-  name: Presence Sensor Blueprint
-  description: Automates lighting based on motion, saves & restores light state.
+  name: "💡 Presence Sensor (Customizable)"
+  description: "Turns off lights after a user-defined time of no motion and restores previous state."
   domain: automation
   input:
     motion_sensor:
       name: Motion Sensor
-      description: Select the motion sensor.
+      description: "Select the motion sensor for detection."
       selector:
         entity:
           domain: binary_sensor
-          device_class: motion
+
     lights:
-      name: Lights to Control
-      description: Choose lights to turn on/off.
+      name: Lights
+      description: "Select the lights to control."
       selector:
         entity:
           domain: light
           multiple: true
+
+    scene_name:
+      name: Scene Name
+      description: "Enter a unique name for the scene (no spaces, use _ instead)."
+      selector:
+        text:
+
     delay_minutes:
-      name: Turn-Off Delay (Minutes)
-      description: Set the delay before turning lights off.
+      name: Delay (Minutes)
+      description: "Minutes before turning off lights after no motion."
       default: 1
       selector:
         number:
           min: 0
           max: 60
-          unit_of_measurement: minutes
+          unit_of_measurement: "min"
+
     delay_seconds:
-      name: Turn-Off Delay (Seconds)
-      description: Additional delay in seconds.
+      name: Delay (Seconds)
+      description: "Additional seconds before turning off lights."
       default: 0
       selector:
         number:
           min: 0
           max: 59
-          unit_of_measurement: seconds
-    scene_name:
-      name: Scene Name
-      description: Customize the saved scene name.
-      default: "presence_lights"
-      selector:
-        text:
+          unit_of_measurement: "sec"
 
 variables:
   scene_full_name: !input scene_name
@@ -104,40 +106,46 @@ trigger:
   - platform: state
     entity_id: !input motion_sensor
     to: "on"
-    id: motion_on
+    id: Motion_ON
+
   - platform: state
     entity_id: !input motion_sensor
     to: "off"
     for:
       minutes: !input delay_minutes
       seconds: !input delay_seconds
-    id: motion_off
-
-condition: []
+    id: Motion_OFF
 
 action:
   - choose:
       - conditions:
           - condition: trigger
-            id: motion_off
+            id: Motion_OFF
+          - condition: state
+            entity_id: !input motion_sensor
+            state: "off"
         sequence:
           - service: scene.create
             data:
-              scene_id: "{{ scene_full_name }}"
               snapshot_entities: !input lights
+              scene_id: "{{ scene_full_name }}"
+
           - service: light.turn_off
             target:
               entity_id: !input lights
+
       - conditions:
           - condition: trigger
-            id: motion_on
+            id: Motion_ON
         sequence:
           - service: scene.turn_on
-            target:
+            data:
               entity_id: "scene.{{ scene_full_name }}"
+
           - service: scene.delete
-            target:
+            data:
               entity_id: "scene.{{ scene_full_name }}"
+
 mode: single
 ```
 
